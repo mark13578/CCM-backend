@@ -9,6 +9,7 @@ namespace CCM.Infrastructure
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<SysUser> SysUsers { get; set; }
+        public DbSet<SysOrganization> SysOrganization { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -92,7 +93,7 @@ namespace CCM.Infrastructure
                       .HasMaxLength(60)
                       .IsRequired();
 
-                entity.Property(e => e.orgid)
+                entity.Property(e => e.OrgId)
                         .HasColumnName("orgid")
                         .IsRequired();
 
@@ -114,6 +115,38 @@ namespace CCM.Infrastructure
                         .HasColumnName("isverified");
                 entity.Property(e => e.verifyexp_time)
                         .HasColumnName("verifyexp_time");
+            });
+
+            modelBuilder.Entity<SysOrganization>(entity =>
+            {
+                entity.ToTable("sys_user"); // 正確使用 ToTable
+
+                entity.HasKey(e => e.Uuid); // 設定主鍵
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+
+                entity.Property(e => e.OrgName)
+                      .HasColumnName("orgname")
+                      .HasMaxLength(20)
+                      .IsRequired();
+
+                entity.Property(e => e.Tel)
+                      .HasColumnName("Tel")
+                      .IsRequired();
+
+                entity.Property(e => e.Ext)
+                      .HasColumnName("ext");
+
+                entity.Property(e => e.GuiNumber).HasColumnName("guinumber")
+                      .HasMaxLength(9)
+                      .IsRequired();
+
+                entity.Property(e => e.AdminUuid).HasColumnName("admin_uuid");
+
+                entity.Property(e => e.TechUuid).HasColumnName("tech_uuid");
+
+                entity.Property(e => e.AccUuid).HasColumnName("acc_uuid");
             });
         }
     }

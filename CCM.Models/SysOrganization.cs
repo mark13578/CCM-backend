@@ -1,36 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CCM.Models
 {
-    public class sys_organization
+    [Table("sys_organization")]
+    public class SysOrganization
     {
-        public string Uuid { get; set; }
-        public string orgname { get; set; }
-        public string tel { get; set; }
-        public string Ext { get; set; }
-        public string guinumber { get; set; }
-        public string admin_uuid { get; set; }
-        public string tech_uuid { get; set; }
-        public string acc_uuid { get; set; }
-        public string docfile { get; set; }
-        public string permission { get; set; }
+        [Key]
+        [Column("uuid")]
+        public Guid Uuid { get; set; }
 
-        public sys_organization(string uuid_, string orgname_, string tel_, string ext_, string guinumber_, string admin_uuid_, string tech_uuid_, string acc_uuid_, string docfile_, string permission_)
-        {
-            this.Uuid = uuid_;
-            this.orgname = orgname_;
-            this.tel = tel_;
-            this.Ext = ext_;
-            this.guinumber = guinumber_;
-            this.admin_uuid = admin_uuid_;
-            this.tech_uuid = tech_uuid_;
-            this.acc_uuid = acc_uuid_;
-            this.docfile = docfile_;
-            this.permission = permission_;
-        }
+        [Column("orgname")]
+        [Required, MaxLength(50)]
+        public string OrgName { get; set; }
+
+        [Column("tel")]
+        [Required, MaxLength(16)]
+        public string Tel { get; set; }
+
+        [Column("ext")]
+        public string? Ext { get; set; }
+
+        [Column("guinumber")]
+        [Required, MaxLength(9)]
+        public string GuiNumber { get; set; }
+
+        [Column("admin_uuid")]
+        public Guid? AdminUuid { get; set; }
+
+        [Column("tech_uuid")]
+        public Guid? TechUuid { get; set; }
+
+        [Column("acc_uuid")]
+        public Guid? AccUuid { get; set; }
+
+        [Column("docfile")]
+        public string? DocFile { get; set; }
+
+        [Column("permission")]
+        public string? Permission { get; set; }
     }
 }

@@ -65,7 +65,7 @@ namespace CCM.Models
 
 
         [Column("orgid")]
-        public int? orgid { get; set; }
+        public Guid? OrgId { get; set; }
 
 
         [Column("pve_token")]
@@ -89,4 +89,10 @@ namespace CCM.Models
 
 
     }
+
+    
+
+
+
+   
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CCM.Models;
 using CCM.Repository;
+
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity.Data;
@@ -14,30 +15,25 @@ using Microsoft.AspNetCore.Identity.Data;
 
 namespace CCM.Services
 {
-
     public interface IAuthService
     {
-        string Register(Models.RegisterRequest request);
+        string Register(CCM.Models.RegisterRequest request); // 確保與 AuthService 一致
         string Login(string username, string password);
+        SysUser GetProfile(Guid uuid);
+        void UpdateProfile(Guid uuid, UpdateProfileRequest request);
+        void DeleteUser(Guid uuid);
     }
-
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
         private const string SecretKey = "YourSuperSecretKey"; // 用於JWT簽名
-
         public AuthService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        public string Register(Models.RegisterRequest request)
+        public string Register(CCM.Models.RegisterRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Country))
-            {
-                throw new Exception("Country cannot be null or empty.");
-            }
-
             var existingUser = _userRepository.GetUserByUsername(request.Username);
             if (existingUser != null)
                 throw new Exception("Username already exists.");
@@ -67,27 +63,36 @@ namespace CCM.Services
 
         public string Login(string username, string password)
         {
+            var encryptedPassword = GetMd5Hash(password);
             var user = _userRepository.GetUserByUsername(username);
-            if (user == null || string.IsNullOrEmpty(user.Password) || user.Password != GetMd5Hash(password))
+            if (user == null || string.IsNullOrEmpty(user.Password) || user.Password != encryptedPassword)
                 throw new Exception("Invalid credentials.");
 
-
-            // Ensure all nullable string properties are handled properly
-            user.RealName = user.RealName ?? string.Empty;
-            user.IdNumber = user.IdNumber ?? string.Empty;
-            user.Phone = user.Phone ?? string.Empty;
-            user.Country = user.Country ?? string.Empty;
-            user.State = user.State ?? string.Empty;
-            user.District = user.District ?? string.Empty;
-            user.Address = user.Address ?? string.Empty;
-            user.ZipCode = user.ZipCode ?? string.Empty;
-            user.Email = user.Email ?? string.Empty;
-            user.docfile1 = user.docfile1 ?? string.Empty;
-            user.docfile2 = user.docfile2 ?? string.Empty;
-            user.docfile2type = user.docfile2type ?? string.Empty;
-
             return GenerateJwtToken(user);
+        }
 
+        public SysUser GetProfile(Guid uuid)
+        {
+            return _userRepository.GetUserById(uuid);
+        }
+
+        public void UpdateProfile(Guid uuid, UpdateProfileRequest request)
+        {
+            var user = _userRepository.GetUserById(uuid);
+            if (user == null) throw new Exception("User not found.");
+
+            user.RealName = request.RealName;
+            user.Phone = request.Phone;
+            user.Address = request.Address;
+            user.Email = request.Email;
+            user.ModifyTime = DateTime.UtcNow;
+
+            _userRepository.UpdateUser(user);
+        }
+
+        public void DeleteUser(Guid uuid)
+        {
+            _userRepository.DeleteUser(uuid);
         }
 
         private string GetMd5Hash(string input)
@@ -119,6 +124,8 @@ namespace CCM.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+       
     }
 
 }

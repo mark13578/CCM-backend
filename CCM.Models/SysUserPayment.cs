@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CCM.Models
 {
-    public class sys_user_payment
+    public class SysUserPayment
     {
         public string uuid { get; set; }
         public string sys_user_uuid { get; set; }
@@ -20,7 +20,7 @@ namespace CCM.Models
         public DateTime create_time { get; set; }
         public DateTime modify_time { get; set; }
 
-        public sys_user_payment(string uuid_, string sys_user_uuid_, string paytype_, string cardnum_, string bankcode_, string bankacc_, string virtualacc_, int balance_, string comment_, DateTime create_time_, DateTime modify_time_)
+        public SysUserPayment(string uuid_, string sys_user_uuid_, string paytype_, string cardnum_, string bankcode_, string bankacc_, string virtualacc_, int balance_, string comment_, DateTime create_time_, DateTime modify_time_)
         {
             this.uuid = uuid_;
             this.sys_user_uuid = sys_user_uuid_;
