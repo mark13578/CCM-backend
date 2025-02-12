@@ -8,15 +8,6 @@ using CCM.Repository;
 
 namespace CCM.Services
 {
-    public interface IOrganizationService
-    {
-        IEnumerable<SysOrganization> GetAllOrganizations();
-        SysOrganization GetOrganizationById(Guid uuid);
-        void CreateOrganization(SysOrganization organization);
-        void UpdateOrganization(Guid uuid, SysOrganization organization);
-        void DeleteOrganization(Guid uuid);
-    }
-
     public class OrganizationService : IOrganizationService
     {
         private readonly IOrganizationRepository _organizationRepository;

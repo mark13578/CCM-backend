@@ -15,6 +15,12 @@ namespace CCM.Infrastructure
 
         public DbSet<SysUserRole> SysUserRole { get; set; }
 
+        public DbSet<SysPermission> SysPermission { get; set; }
+
+        public DbSet<SysMenu> SysMenu { get; set; }
+
+        public DbSet<SysRolePermission> SysRolePermission { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -180,6 +186,74 @@ namespace CCM.Infrastructure
                       .HasColumnName("role_uuid")
                       .IsRequired();
             });
+
+            modelBuilder.Entity<SysPermission>(entity =>
+            {
+                entity.ToTable("sys_permission");
+                entity.HasKey(e => e.Uuid);
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+                entity.Property(e => e.PermissionName)
+                      .HasColumnName("permission_name")
+                      .IsRequired();
+                entity.Property(e => e.Description)
+                      .HasColumnName("description")
+                      .HasMaxLength(20);                      
+                entity.Property(e => e.Menu_Uuid)
+                      .HasColumnName("menu_uuid")
+                      .HasMaxLength(20)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<SysMenu>(entity =>
+            {
+                entity.ToTable("sys_menu");
+                entity.HasKey(e => e.Uuid);
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+                entity.Property(e => e.Name)
+                      .HasColumnName("name")
+                      .HasMaxLength(20)
+                      .IsRequired();
+                entity.Property(e => e.Path)
+                     .HasColumnName("path")
+                     .HasMaxLength(20)
+                     .IsRequired();
+                entity.Property(e => e.Icon)
+                     .HasColumnName("icon")
+                     .HasMaxLength(20)
+                     .IsRequired();
+                entity.Property(e => e.ParentUuid)
+                      .HasColumnName("parent_uuid")
+                      .IsRequired();
+                entity.Property(e => e.Order)
+                      .HasColumnName("order_num")
+                      .HasMaxLength(20)
+                      .IsRequired();
+                entity.Property(e => e.Visible)
+                      .HasColumnName("visible")
+                      .HasMaxLength(20)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<SysRolePermission>(entity =>
+            {
+                entity.ToTable("sys_role_permission");
+                entity.HasKey(e => e.Uuid);
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+                entity.Property(e => e.RoleUuid)
+                      .HasColumnName("role_uuid")
+                      .IsRequired();
+                entity.Property(e => e.PermissionUuid)
+                      .HasColumnName("permission_uuid")
+                      .IsRequired();
+            });
         }
+
+
     }
 }
