@@ -59,6 +59,18 @@ namespace CCM.Repository
                 _context.SaveChanges();
             }
         }
+
+       
+        public void AddUserRole(SysUserRole userRole)
+        {
+            _context.SysUserRole.Add(userRole);
+            _context.SaveChanges();
+        }
+
+        public IEnumerable<SysUserRole> GetUserRolesByUserId(Guid userUuid)
+        {
+            return _context.SysUserRole.Where(ur => ur.UserUuid == userUuid).ToList();
+        }
     }
 
 

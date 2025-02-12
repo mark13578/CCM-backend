@@ -42,6 +42,8 @@ namespace CCM.Models
 
         public DateTime ModifyTime { get; set; }
 
+        public Guid? RoleUuid { get; set; }
+
 
 
 

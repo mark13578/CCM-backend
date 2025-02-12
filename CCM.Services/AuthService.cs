@@ -11,28 +11,29 @@ using CCM.Repository;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.EntityFrameworkCore;
+using CCM.Infrastructure;
 
 
 namespace CCM.Services
 {
-    public interface IAuthService
-    {
-        string Register(CCM.Models.RegisterRequest request); // 確保與 AuthService 一致
-        string Login(string username, string password);
-        SysUser GetProfile(Guid uuid);
-        void UpdateProfile(Guid uuid, UpdateProfileRequest request);
-        void DeleteUser(Guid uuid);
-    }
+
     public class AuthService : IAuthService
     {
+        private readonly AppDbContext _context;
         private readonly IUserRepository _userRepository;
-        private const string SecretKey = "YourSuperSecretKey"; // 用於JWT簽名
-        public AuthService(IUserRepository userRepository)
+        private readonly IUserRoleRepository _userRoleRepository;
+        private const string SecretKey = "YourSuperSecretKey";
+        private const string DefaultPersonalRoleUuid = "00000000-0000-0000-0000-000000000001";
+
+        public AuthService(AppDbContext context, IUserRepository userRepository, IUserRoleRepository userRoleRepository)
         {
+            _context = context;
             _userRepository = userRepository;
+            _userRoleRepository = userRoleRepository;
         }
 
-        public string Register(CCM.Models.RegisterRequest request)
+        public string Register(Models.RegisterRequest request)
         {
             var existingUser = _userRepository.GetUserByUsername(request.Username);
             if (existingUser != null)
@@ -45,19 +46,25 @@ namespace CCM.Services
                 Username = request.Username,
                 Password = encryptedPassword,
                 RealName = request.RealName,
-                IdNumber = request.IdNumber,
-                Phone = request.Phone,
-                Country = request.Country,
-                State = request.State,
-                District = request.District,
-                Address = request.Address,
-                ZipCode = request.Zipcode,
                 Email = request.Email,
+                Phone = request.Phone,
                 CreateTime = DateTime.UtcNow,
                 ModifyTime = DateTime.UtcNow
             };
 
-            _userRepository.AddUser(user);
+            AddUserToDatabase(user);
+
+            var roleUuid = request.RoleUuid ?? Guid.Parse(DefaultPersonalRoleUuid);
+
+            var userRole = new SysUserRole
+            {
+                Uuid = Guid.NewGuid(),
+                UserUuid = user.Uuid,
+                RoleUuid = roleUuid
+            };
+
+            _userRoleRepository.AddUserRole(userRole);
+
             return "Registration successful";
         }
 
@@ -125,7 +132,11 @@ namespace CCM.Services
             return tokenHandler.WriteToken(token);
         }
 
-       
+        private void AddUserToDatabase(SysUser user)
+        {
+            _context.SysUsers.Add(user);
+            _context.SaveChanges();
+        }
     }
 
 }

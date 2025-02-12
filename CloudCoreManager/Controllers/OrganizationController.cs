@@ -12,6 +12,7 @@ namespace CCM.WebAPI.Controllers
     {
         private readonly IOrganizationService _organizationService;
         private readonly IAuthService _authService;
+        private const string PersonalRoleUuid = "00000000-0000-0000-0000-000000000001"; // 預設個人用戶組 UUID
 
         public OrganizationController(IOrganizationService organizationService, IAuthService authService)
         {
@@ -83,8 +84,7 @@ namespace CCM.WebAPI.Controllers
                         RealName = values[2],
                         Email = values[3],
                         Phone = values[4],
-                        Uuid = Guid.NewGuid(),
-                        OrgId = orgUuid
+                        Uuid = Guid.NewGuid()
                     };
 
                     _authService.Register(new RegisterRequest
@@ -93,7 +93,8 @@ namespace CCM.WebAPI.Controllers
                         Password = values[1],
                         RealName = user.RealName,
                         Email = user.Email,
-                        Phone = user.Phone
+                        Phone = user.Phone,
+                        RoleUuid = orgUuid // ✅ 使用企業的 UUID 作為角色
                     });
                 }
             }
@@ -106,18 +107,15 @@ namespace CCM.WebAPI.Controllers
         {
             try
             {
-                var user = new SysUser
+                _authService.Register(new RegisterRequest
                 {
                     Username = request.Username,
-                    Password = HashPassword(request.Password),
+                    Password = request.Password,
                     RealName = request.RealName,
                     Email = request.Email,
                     Phone = request.Phone,
-                    Uuid = Guid.NewGuid(),
-                    OrgId = orgUuid
-                };
-
-                _authService.Register(request);
+                    RoleUuid = orgUuid // ✅ 使用企業的 UUID 作為角色
+                });
                 return Ok("User added successfully.");
             }
             catch (Exception ex)
@@ -126,7 +124,7 @@ namespace CCM.WebAPI.Controllers
             }
         }
 
-        public string HashPassword(string password)
+        private string HashPassword(string password)
         {
             using (var md5 = MD5.Create())
             {
@@ -137,3 +135,4 @@ namespace CCM.WebAPI.Controllers
         }
     }
 }
+

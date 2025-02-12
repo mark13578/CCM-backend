@@ -38,7 +38,10 @@ namespace CCM.Services
 
         public void CreateOrganization(SysOrganization organization)
         {
-            organization.Uuid = Guid.NewGuid();
+            if (organization.Uuid == Guid.Empty)  // 檢查是否已有 UUID，若無則生成
+            {
+                organization.Uuid = Guid.NewGuid();
+            }
             _organizationRepository.AddOrganization(organization);
         }
 

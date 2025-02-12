@@ -11,6 +11,10 @@ namespace CCM.Infrastructure
         public DbSet<SysUser> SysUsers { get; set; }
         public DbSet<SysOrganization> SysOrganization { get; set; }
 
+        public DbSet<SysRole> SysRole { get; set; }
+
+        public DbSet<SysUserRole> SysUserRole { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -147,6 +151,34 @@ namespace CCM.Infrastructure
                 entity.Property(e => e.TechUuid).HasColumnName("tech_uuid");
 
                 entity.Property(e => e.AccUuid).HasColumnName("acc_uuid");
+            });
+
+            modelBuilder.Entity<SysRole>(entity =>
+            {
+                entity.ToTable("sys_role");
+                entity.HasKey(e => e.Uuid);
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+                entity.Property(e => e.RoleName)
+                      .HasColumnName("rolename")
+                      .HasMaxLength(20)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<SysUserRole>(entity =>
+            {
+                entity.ToTable("sys_user_role");
+                entity.HasKey(e => e.Uuid);
+                entity.Property(e => e.Uuid)
+                      .HasColumnName("uuid")
+                      .IsRequired();
+                entity.Property(e => e.UserUuid)
+                      .HasColumnName("user_uuid")
+                      .IsRequired();
+                entity.Property(e => e.RoleUuid)
+                      .HasColumnName("role_uuid")
+                      .IsRequired();
             });
         }
     }
